@@ -16,6 +16,10 @@ module RFunc
       @set
     end
 
+    def [](v)
+      @set[v]
+    end
+
     def head
       raise "RFunc::Seq #{@set} has no head" if @set.size == 0
       raw_head
@@ -25,12 +29,16 @@ module RFunc
       (h_e = raw_head) ? Some.new(h_e) : None.new
     end
 
+    def tail_option
+      (tail[0]) ? Some.new(tail) : None.new
+    end
+
     def tail
-      @set[1..-1] || Seq.new
+      (t_s = @set[1..-1]) ? Seq.new(t_s) : Seq.new
     end
 
     def map(&block)
-      @set.map{|v| yield(v) }
+      Seq.new(@set.map{|v| yield(v) })
     end
 
     def fold(accum, &block)
@@ -61,6 +69,10 @@ module RFunc
 
     def find(&block)
       filter {|el| yield(el) }.head_option
+    end
+
+    def collect(&block)
+      fold(Seq.new([])) {|accum, el| (res = yield(el)) ? accum.append(res) : accum }
     end
 
     private

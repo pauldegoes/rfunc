@@ -13,6 +13,4 @@ module RFunc
   def some(v); RFunc::Some.new(v) end
 
   def none; RFunc::None.new end
-
-  def set; [] end
 end

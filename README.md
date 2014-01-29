@@ -1,6 +1,6 @@
 # RFunc
 
-TODO: Write a gem description
+This gem provides access to a functionally oriented collections library.  First release will include Seq and Option support.
 
 ## Installation
 
@@ -18,7 +18,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+###RFunc
+The RFunc module provides access to some helper methods that let you form RFunc classes in a less verbosity.
+
+      `require "rfunc"
+
+      include RFunc
+
+      seq([1,2,3]) => RFunc::Seq(1,2,3)
+
+      option(nil)  => RFunc::None
+
+      option(1)  => RFunc::Some(1)
+      `
+
+####RFunc::Seq
+The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it accepts and provides the following methods:
+
+* [] => access an element of the Seq by index
+* head => return the first element of the Seq
+* head_option => return an Option of the first element of the Seq
+* tail => return all elements of the Seq except the head
+* tail_option => return an Option of all the elements of the Seq
+* map(block) => returns a Seq, the members of which have been operated on by the provided block
 
 ## Contributing
 
