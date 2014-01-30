@@ -21,7 +21,7 @@ Or install it yourself as:
 ###RFunc
 The RFunc module provides access to some helper methods that let you form RFunc classes in a less verbosity.
 
-      `require "rfunc"
+      require "rfunc"
 
       include RFunc
 
@@ -30,7 +30,7 @@ The RFunc module provides access to some helper methods that let you form RFunc 
       option(nil)  => RFunc::None
 
       option(1)  => RFunc::Some(1)
-      `
+
 
 ####RFunc::Seq
 The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it accepts and provides the following methods:
