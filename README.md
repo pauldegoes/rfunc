@@ -59,6 +59,11 @@ The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it acc
 
         RFunc::Seq.new([1,2,3]).map{|v| v*2 } => Seq([2, 4, 6])
 
+## TODO
+
+* Complete Seq library
+* Complete Option library
+
 
 ## Contributing
 

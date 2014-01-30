@@ -10,6 +10,10 @@ module RFunc
 
     def get; @value end
 
+    def get_or_else(&block)
+      empty? ? yield : get
+    end
+
     # returns an Option
     def map(&block)
       case self
@@ -21,7 +25,7 @@ module RFunc
     end
 
     def empty?
-      case self
+      @empty ||= case self
         when RFunc::Some
           false
         else

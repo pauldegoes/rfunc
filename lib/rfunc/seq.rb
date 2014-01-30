@@ -8,6 +8,18 @@ module RFunc
       @set = set
     end
 
+    def all
+      @all ||= Seq.new(@set)
+    end
+
+    def <<(el)
+      Seq.new(@set << el)
+    end
+
+    def +(seq2)
+      Seq.new(@set + seq2)
+    end
+
     def ==(object)
       object.class == self.class && object.members == @set
     end
@@ -22,11 +34,11 @@ module RFunc
 
     def head
       raise "RFunc::Seq #{@set} has no head" if @set.size == 0
-      raw_head
+      @head ||= raw_head
     end
 
     def head_option
-      (h_e = raw_head) ? Some.new(h_e) : None.new
+      @head_option ||= (h_e = raw_head) ? Some.new(h_e) : None.new
     end
 
     def tail_option
@@ -34,7 +46,7 @@ module RFunc
     end
 
     def tail
-      (t_s = @set[1..-1]) ? Seq.new(t_s) : Seq.new
+      @tail ||= (t_s = @set[1..-1]) ? Seq.new(t_s) : Seq.new
     end
 
     def map(&block)
@@ -42,7 +54,13 @@ module RFunc
     end
 
     def fold(accum, &block)
-      @set.inject(accum) {|a, el| yield(a, el) }
+      head_option.map{|h|
+        tail_option.map{|t|
+          t.fold(block.call(accum, h)) {|a, el|
+            yield(a, el)
+          }
+        }.get_or_else{ yield(accum, h) }
+      }.get_or_else{ accum }
     end
 
     def prepend(el)
