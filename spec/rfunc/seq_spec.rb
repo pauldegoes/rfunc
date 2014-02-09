@@ -15,8 +15,20 @@ describe RFunc::Seq do
   end
 
   describe "#fold" do
-    it "allows for simplistic folding" do
-      seq.fold({}) {|accum, value| accum["v#{value}"] = value; accum }.should eq({"v1"=>1, "v2"=>2, "v3"=>3})
+    it "allows for simplistic folding from the left" do
+      seq.fold({}) {|accum, value| accum["v#{value}"] = value; accum }.to_s.should eq({"v1"=>1, "v2"=>2, "v3"=>3}.to_s)
+    end
+  end
+
+  describe "#foldl" do
+    it "allows for simplistic folding from the left" do
+      seq.foldl({}) {|accum, value| accum["v#{value}"] = value; accum }.to_s.should eq({"v1"=>1, "v2"=>2, "v3"=>3}.to_s)
+    end
+  end
+
+  describe "#foldr" do
+    it "allows for simplistic folding from the right" do
+      seq.foldr({}) {|accum, value| accum["v#{value}"] = value; accum }.to_s.should eq({"v3"=>3, "v2"=>2, "v1"=>1}.to_s)
     end
   end
 

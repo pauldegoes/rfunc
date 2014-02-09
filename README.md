@@ -10,7 +10,7 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -63,7 +63,7 @@ The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it acc
 
 * Complete Seq library
 * Complete Option library
-
+* Fix naive implementation of foldr, which currently uses reverse (sub optimal)
 
 ## Contributing
 

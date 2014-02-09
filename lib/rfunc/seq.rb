@@ -63,6 +63,12 @@ module RFunc
       }.get_or_else{ accum }
     end
 
+    def foldr(accum, &block)
+      Seq.new(@set.reverse).fold(accum) {|accum, el| yield(accum, el) }
+    end
+
+    alias_method :foldl, :fold
+
     def prepend(el)
       Seq.new(@set.unshift(el))
     end
