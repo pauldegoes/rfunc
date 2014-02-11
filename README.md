@@ -59,11 +59,40 @@ The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it acc
 
         RFunc::Seq.new([1,2,3]).map{|v| v*2 } => Seq([2, 4, 6])
 
+* slice(from, to) => returns a Seq containing the given range
+        RFunc::Seq.new([1,2,3,4,5]).slice(2,3) => Seq([2,3,4])
+
+* fold(accum, &block) => returns the value of the yielded block, which takes an accumulator and a Seq element from left to right
+        RFunc::Seq.new([1,2,3]).fold(RFunc::Seq.new([])) {|accum, el| accum.append(el + el) } => Seq([2,4,6])
+
+* foldr(accum, &block) => returns the value of the yielded block, which takes an accumulator and a Seq element from right to left
+        RFunc::Seq.new([1,2,3]).foldr(RFunc::Seq.new([])) {|accum, el| accum.append(el + el) } => Seq([6,4,2])
+
+* first_option => returns an Option of the first element (Some of None)
+        RFunc::Seq.new([1,2]).first_option => Some(1)
+        RFunc::Seq.new([]).first_option => None
+
+* last_option => returns an Option of the last element (Some of None)
+        RFunc::Seq.new([1,2]).last_option => Some(2)
+        RFunc::Seq.new([]).last_option => None
+
+* append(el) => returns an RFunc::Seq with the element appended
+        RFunc::Seq.new([1]).append(2) => Seq([1,2])
+
+* prepend(el) => returns an RFunc::Seq with the element prepended
+        RFunc::Seq.new([2]).prepend(1) => Seq([1,2])
+
+* empty? => returns true or false based on whether or not there are elements in the Seq
+        RFunc::Seq.new([]).empty? => true
+        RFunc::Seq.new([1]).empty? => false
+
+* reverse => returns an RFunc::Seq with the elements reversed
+        RFunc::Seq.new([1,2,3,4,5]).reverse => Seq([5,4,3,2,1])
+
 ## TODO
 
 * Complete Seq library
 * Complete Option library
-* Fix naive implementation of foldr, which currently uses reverse (sub optimal)
 
 ## Contributing
 

@@ -5,58 +5,74 @@ module RFunc
     def initialize(set=[])
       raise "RFunc::Seq must be initialized with an Array.  #{set.class} is not an Array" if set.class != Array
 
-      @set = set
+      @array = set
     end
 
     def all
-      @all ||= Seq.new(@set)
+      @all ||= Seq.new(@array)
     end
 
     def <<(el)
-      Seq.new(@set << el)
+      Seq.new(@array << el)
     end
 
     def +(seq2)
-      Seq.new(@set + seq2)
+      Seq.new(@array + seq2)
     end
 
     def ==(object)
-      object.class == self.class && object.members == @set
+      object.class == self.class && object.members == @array
     end
 
     def members
-      @set
+      @array
     end
 
     def [](v)
-      @set[v]
+      @array[v]
+    end
+
+    def empty?
+      @array.size == 0
     end
 
     def head
-      raise "RFunc::Seq #{@set} has no head" if @set.size == 0
+      raise "RFunc::Seq #{@array} has no head" if @array.size == 0
       @head ||= raw_head
     end
+
+    alias_method :first, :head
 
     def head_option
       @head_option ||= (h_e = raw_head) ? Some.new(h_e) : None.new
     end
+
+    alias_method :first_option, :head_option
 
     def tail_option
       (tail[0]) ? Some.new(tail) : None.new
     end
 
     def tail
-      @tail ||= (t_s = @set[1..-1]) ? Seq.new(t_s) : Seq.new
+      @tail ||= (t_s = @array[1..-1]) ? Seq.new(t_s) : Seq.new
+    end
+
+    def last
+      @last ||= @array.at(@array.size - 1)
+    end
+
+    def last_option
+      @last_option ||= last ? Some.new(last) : None.new
     end
 
     def map(&block)
-      Seq.new(@set.map{|v| yield(v) })
+      Seq.new(@array.map{|v| yield(v) })
     end
 
     def fold(accum, &block)
       head_option.map{|h|
         tail_option.map{|t|
-          t.fold(block.call(accum, h)) {|a, el|
+          t.fold(yield(accum, h)) {|a, el|
             yield(a, el)
           }
         }.get_or_else{ yield(accum, h) }
@@ -64,21 +80,35 @@ module RFunc
     end
 
     def foldr(accum, &block)
-      Seq.new(@set.reverse).fold(accum) {|accum, el| yield(accum, el) }
+      last_option.map{|t|
+        sliced = slice(0, @array.size - 1)
+
+        if (!sliced.empty?)
+          sliced.foldr(yield(accum, t)) {|a, el|
+            yield(a, el)
+          }
+        else
+          yield(accum, t)
+        end
+      }.get_or_else{ accum }
     end
 
     alias_method :foldl, :fold
 
+    def slice(from, to)
+      Seq.new(@array.slice(from, to))
+    end
+
     def prepend(el)
-      Seq.new(@set.unshift(el))
+      Seq.new(@array.unshift(el))
     end
 
     def append(el)
-      Seq.new(@set.push(el))
+      Seq.new(@array.push(el))
     end
 
     def reverse
-      Seq.new(@set.reverse)
+      Seq.new(@array.reverse)
     end
 
     def filter(&block)
@@ -100,6 +130,6 @@ module RFunc
     end
 
     private
-      def raw_head; @set[0] end
+      def raw_head; @array[0] end
   end
 end

@@ -8,6 +8,19 @@ describe RFunc::Seq do
     expect { RFunc::Seq.new({}) }.to raise_error
   end
 
+  describe "#empty?" do
+    context "when there are elements in the Seq" do
+      it "returns true" do
+        seq.empty?.should == false
+      end
+    end
+    context "when there are no elements in the Seq" do
+      it "returns false" do
+        RFunc::Seq.new([]).empty?.should == true
+      end
+    end
+  end
+
   describe "#map" do
     it "allows for simplistic mapping" do
       seq.map {|v| v * 2}.should == RFunc::Seq.new([2, 4, 6])
@@ -32,6 +45,13 @@ describe RFunc::Seq do
     end
   end
 
+  describe "#slice" do
+    it "returns a Seq of for the specified range" do
+      seq.slice(0,3).should == seq
+      RFunc::Seq.new([1,2,3,4,5]).slice(1,3).should == RFunc::Seq.new([2,3,4])
+    end
+  end
+
   describe "#head" do
     context "when seq has a head" do
       it "returns the first element of a list" do
@@ -45,6 +65,19 @@ describe RFunc::Seq do
     end
   end
 
+  describe "#first" do
+    context "when seq has a head" do
+      it "returns the first element of a list" do
+        seq.first.should eq(1)
+      end
+    end
+    context "when seq does not have a head" do
+      it "throws an exception" do
+        expect { RFunc::Seq.new([]).first }.to raise_error
+      end
+    end
+  end
+
   describe "#head_option" do
     context "when seq has a head" do
       it "returns a Some of the first element of a list" do
@@ -54,6 +87,19 @@ describe RFunc::Seq do
     context "when seq does not have a head" do
       it "returns a None" do
         RFunc::Seq.new([]).head_option.should == RFunc::None.new
+      end
+    end
+  end
+
+  describe "#first_option" do
+    context "when seq has a head" do
+      it "returns a Some of the first element of a list" do
+        seq.first_option.should == RFunc::Some.new(1)
+      end
+    end
+    context "when seq does not have a head" do
+      it "returns a None" do
+        RFunc::Seq.new([]).first_option.should == RFunc::None.new
       end
     end
   end
@@ -94,6 +140,32 @@ describe RFunc::Seq do
     context "when has more than a single member" do
       it "returns a Some of the tail" do
         seq.tail_option.should == RFunc::Some.new(RFunc::Seq.new([2,3]))
+      end
+    end
+  end
+
+  describe "#last" do
+    context "when the array has an element" do
+      it "returns the final element in the array" do
+        seq.last.should == 3
+      end
+    end
+    context "when the array does not have any elements" do
+      it "returns nil" do
+        RFunc::Seq.new([]).last.should be_nil
+      end
+    end
+  end
+
+  describe "#last_option" do
+    context "when the array has an element" do
+      it "returns a Some of the final element in the array" do
+        seq.last_option.should == RFunc::Some.new(3)
+      end
+    end
+    context "when the array does not have any elements" do
+      it "returns a NOne" do
+        RFunc::Seq.new([]).last_option.should == RFunc::None.new
       end
     end
   end
