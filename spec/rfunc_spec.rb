@@ -2,28 +2,28 @@ require 'spec_helper'
 
 describe RFunc do
   include RFunc
-  describe "#seq" do
+  describe "#Seq" do
     it "returns an RFunc::Seq" do
-      seq([1,2,3]).class.should == RFunc::Seq
+      Seq([1,2,3]).class.should == RFunc::Seq
     end
   end
 
-  describe "#option" do
+  describe "#Option" do
     it "returns the appropriate RFunc::Option" do
-      option(nil).class.should == RFunc::None
-      option("foo").class.should == RFunc::Some
+      Option(nil).class.should == RFunc::None
+      Option("foo").class.should == RFunc::Some
     end
   end
 
-  describe "#some" do
+  describe "#Some" do
     it "returns the an RFunc::Some" do
-      some(1).should.class == RFunc::Some
+      Some(1).class.should == RFunc::Some
     end
   end
 
-  describe "#none" do
+  describe "#None" do
     it "returns the an RFunc::None" do
-      none.should.class == RFunc::None
+      None().class.should == RFunc::None
     end
   end
 end

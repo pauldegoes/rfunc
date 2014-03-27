@@ -25,11 +25,11 @@ The RFunc module provides access to some helper methods that let you form RFunc 
 
       include RFunc
 
-      seq([1,2,3]) => RFunc::Seq(1,2,3)
+      Seq([1,2,3]) => RFunc::Seq(1,2,3)
 
-      option(nil)  => RFunc::None
+      Option(nil)  => RFunc::None
 
-      option(1)  => RFunc::Some(1)
+      Option(1)  => RFunc::Some(1)
 
 
 ####RFunc::Seq

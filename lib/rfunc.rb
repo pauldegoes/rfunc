@@ -7,11 +7,11 @@ require "rfunc/errors"
 module RFunc
   module_function
 
-  def seq(a); RFunc::Seq.new(a) end
+  def Seq(a); RFunc::Seq.new(a) end
 
-  def option(v); RFunc::Option.new(v) end
+  def Option(v); RFunc::Option.new(v) end
 
-  def some(v); RFunc::Some.new(v) end
+  def Some(v); RFunc::Some.new(v) end
 
-  def none; RFunc::None.new end
+  def None; RFunc::None.new end
 end
