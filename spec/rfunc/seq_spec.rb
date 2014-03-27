@@ -242,4 +242,63 @@ describe RFunc::Seq do
       }.should == RFunc::Seq.new([8])
     end
   end
+
+  describe "#join" do
+    it "joins the elements of the Seq together (into a String) using the supplied character" do
+      seq.join(",").should == "1,2,3"
+    end
+  end
+
+  describe "#collect_first" do
+    context "when an element exists for which the supplied block returns true" do
+      it "returns a Some of operation" do
+        seq.collect_first{|el|
+          case el == 2
+            when true; el * 100
+          end
+        }.should == RFunc::Some.new(200)
+      end
+    end
+
+    context "when an element does not exist for which the supplied block returns true" do
+      it "returns a None" do
+        seq.collect_first{|el|
+          case el == 222
+            when true; el * 100
+          end
+        }.should == RFunc::None.new
+      end
+    end
+  end
+
+  describe "#concat" do
+    context "when passing in a Ruby Array" do
+      it "returns a Seq with the specified array members concatenated" do
+        seq.concat([4,5,6]).should == RFunc::Seq.new([1,2,3,4,5,6])
+      end
+    end
+    context "when passing in a Seq" do
+      it "returns a Seq with the specified Seq's members concatenated" do
+        seq.concat(RFunc::Seq.new([9,8,7])).should == RFunc::Seq.new([1,2,3,9,8,7])
+      end
+    end
+    context "when an empty array is passed in" do
+      it "returns an unchanged Seq" do
+        seq.concat([]).should == seq
+      end
+    end
+  end
+
+  describe "#flat_map" do
+    context "when the array is empty" do
+      it "returns an empty Seq" do
+        RFunc::Seq.new().flat_map {|el| [el, el + 1, el + 2] }.should == RFunc::Seq.new
+      end
+    end
+    context "when the array is not empty" do
+      it "returns a flattened Seq" do
+        seq.flat_map {|el| [el, el + 1, el + 2] }.should == RFunc::Seq.new([1,2,3,2,3,4,3,4,5])
+      end
+    end
+  end
 end

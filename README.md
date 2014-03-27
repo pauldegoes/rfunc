@@ -98,6 +98,17 @@ The RFunc::Seq (Sequence) is a replacement for the Ruby Array class which it acc
 
         RFunc::Seq.new([1,2,3,4,5]).reverse => Seq([5,4,3,2,1])
 
+* concat => returns an RFunc::Seq with the provided elements appended
+        RFunc::Seq.new([1,2,3]).concat([2,1]) => Seq([1, 2, 3, 2, 1])
+        RFunc::Seq.new([1,2,3]).concat(RFunc::Seq.new([2,1])) => Seq([1, 2, 3, 2, 1])
+
+* flat_map => returns a flattened RFunc::Seq, whose members are derived from operating on each element of the existing Seq
+        RFunc::Seq.new([1,2,3]).flat_map {|el| [el, el -1, el -2] } => Seq([1, 0, -1, 2, 1, 0, 3, 2, 1]>)
+
+## CAVEATES
+
+Ruby is NOT a functional language, nor is it optimized for functional code (tail call recursion for instance).  As a result, this library utilizes native Ruby comprehensions in order to remain performant and useful.  Any libraries built on this code should take the same approach.
+
 ## TODO
 
 * Complete Seq library

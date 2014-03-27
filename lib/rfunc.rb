@@ -1,6 +1,7 @@
 require "rfunc/version"
 require "rfunc/option"
 require "rfunc/seq"
+require "rfunc/errors"
 
 
 module RFunc

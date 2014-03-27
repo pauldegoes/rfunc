@@ -9,7 +9,7 @@ module RFunc
     end
 
     def all
-      @all ||= Seq.new(@array)
+      Seq.new(@array)
     end
 
     def <<(el)
@@ -38,13 +38,13 @@ module RFunc
 
     def head
       raise "RFunc::Seq #{@array} has no head" if @array.size == 0
-      @head ||= raw_head
+     raw_head
     end
 
     alias_method :first, :head
 
     def head_option
-      @head_option ||= (h_e = raw_head) ? Some.new(h_e) : None.new
+      (h_e = raw_head) ? Some.new(h_e) : None.new
     end
 
     alias_method :first_option, :head_option
@@ -58,11 +58,12 @@ module RFunc
     end
 
     def last
-      @last ||= @array.at(@array.size - 1)
+      @array.at(@array.size - 1)
     end
 
     def last_option
-      @last_option ||= last ? Some.new(last) : None.new
+      l = last
+      l ? Some.new(l) : None.new
     end
 
     def map(&block)
@@ -70,27 +71,11 @@ module RFunc
     end
 
     def fold(accum, &block)
-      head_option.map{|h|
-        tail_option.map{|t|
-          t.fold(yield(accum, h)) {|a, el|
-            yield(a, el)
-          }
-        }.get_or_else{ yield(accum, h) }
-      }.get_or_else{ accum }
+      @array.inject(accum) {|a, el| yield(a, el) }
     end
 
     def foldr(accum, &block)
-      last_option.map{|t|
-        sliced = slice(0, @array.size - 1)
-
-        if (!sliced.empty?)
-          sliced.foldr(yield(accum, t)) {|a, el|
-            yield(a, el)
-          }
-        else
-          yield(accum, t)
-        end
-      }.get_or_else{ accum }
+      @array.reverse.inject(accum) {|a, el| yield(a, el) }
     end
 
     alias_method :foldl, :fold
@@ -114,19 +99,44 @@ module RFunc
     def filter(&block)
       fold(Seq.new) {|accum, el|
         if yield(el)
-          accum.prepend(el)
+          accum.append(el)
         else
           accum
         end
-      }.reverse
+      }
     end
 
     def find(&block)
-      filter {|el| yield(el) }.head_option
+      RFunc::Option.new(@array.find {|el| yield(el) })
     end
 
     def collect(&block)
       fold(Seq.new([])) {|accum, el| (res = yield(el)) ? accum.append(res) : accum }
+    end
+
+    def collect_first(&block)
+      # more performant than it's prettier version
+      result = nil
+      find {|el| result = yield(el) }
+      result ? RFunc::Some.new(result) : RFunc::None.new
+    end
+
+    def join(char)
+      @array.join(char)
+    end
+
+    def concat(seq_or_array)
+      if seq_or_array.is_a?(Seq)
+        Seq.new(@array.concat(seq_or_array.members))
+      else
+        Seq.new(@array.concat(seq_or_array))
+      end
+    end
+
+    def flat_map(&block)
+      fold(Seq.new) {|accum, el|
+        accum.concat(yield(el))
+      }
     end
 
     private

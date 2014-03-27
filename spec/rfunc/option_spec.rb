@@ -51,4 +51,50 @@ describe RFunc::Option do
       end
     end
   end
+
+  describe "#flat_map" do
+    context "when the option is a None" do
+      it "does not perform the operation" do
+        expect {
+          RFunc::None.new.flat_map{|v| throw 'should not throw anything' }
+        }.not_to raise_error
+      end
+    end
+    context "when the option is a Some and return type is not a Some of None" do
+      it "raises an error" do
+        expect {
+          RFunc::Some.new(1).flat_map{|v| v + v }
+        }.to raise_error(RFunc::Errors::InvalidReturnType)
+      end
+    end
+    context "when the option is a Some" do
+      it "returns the result of the yield" do
+        RFunc::Some.new(1).flat_map{|v| RFunc::Some.new(v + v) }.should == RFunc::Some.new(2)
+
+        RFunc::Some.new(1).flat_map{|v| RFunc::None.new }.should == RFunc::None.new
+      end
+    end
+
+    describe "#or_else" do
+      context "when the option is a Some" do
+        it "returns the option" do
+          RFunc::Some.new(1).or_else(RFunc::Some.new(2)).get.should == 1
+        end
+      end
+      context "when the option is a None" do
+        context "when the return type of the supplied alternative is valid" do
+          it "returns the option" do
+            RFunc::None.new.or_else(RFunc::Some.new(2)).get.should == 2
+          end
+        end
+        context "when the return type of the supplied alternative is invalid" do
+          it "raises an exception" do
+            expect {
+              RFunc::None.new.or_else(2).get.should == 2
+            }.to raise_error(RFunc::Errors::InvalidReturnType)
+          end
+        end
+      end
+    end
+  end
 end

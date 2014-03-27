@@ -1,3 +1,5 @@
+require 'rfunc/errors'
+
 module RFunc
   class AbstractOption
     def initialize(value)
@@ -12,6 +14,10 @@ module RFunc
 
     def get_or_else(&block)
       empty? ? yield : get
+    end
+
+    def or_else(v)
+      empty? ? validated_option_type(v) : self
     end
 
     # returns an Option
@@ -32,6 +38,21 @@ module RFunc
           true
       end
     end
+
+    def flat_map(&block)
+      if empty?
+        None.new
+      else
+        validated_option_type(yield(get))
+      end
+    end
+
+    private
+
+      def validated_option_type(r)
+        raise RFunc::Errors::InvalidReturnType.new(r, AbstractOption) if !r.is_a?(AbstractOption)
+        r
+      end
   end
 
   class Some < AbstractOption
