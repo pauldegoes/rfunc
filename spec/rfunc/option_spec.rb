@@ -97,4 +97,57 @@ describe RFunc::Option do
       end
     end
   end
+
+  describe "#filter" do
+    context "when filter matches" do
+      it "returns a Some" do
+        RFunc::Some.new(1).filter {|el| el == 1}.should == RFunc::Some.new(1)
+      end
+    end
+    context "when filter does not match" do
+      it "returns a None" do
+        RFunc::Some.new(1).filter {|el| el == 2}.should == RFunc::None.new
+      end
+    end
+    context "when None is supplied" do
+      it "returns a None" do
+        RFunc::None.new.filter {|el| el == "foo" }.should == RFunc::None.new
+      end
+    end
+  end
+
+  describe "#filter_not" do
+    context "when filter matches" do
+      it "returns a None" do
+        RFunc::Some.new(1).filter_not {|el| el == 1}.should == RFunc::None.new
+      end
+    end
+    context "when filter does not match" do
+      it "returns a Some" do
+        RFunc::Some.new(1).filter_not {|el| el == 2}.should == RFunc::Some.new(1)
+      end
+    end
+    context "when None is supplied" do
+      it "returns a None" do
+        RFunc::None.new.filter_not {|el| el == "foo" }.should == RFunc::None.new
+      end
+    end
+  end
+
+  describe "#fold" do
+    context "when the option is a None" do
+      it "returns the alternate" do
+        RFunc::None.new.fold(2) {|el|
+          el * el
+        }.should == 2
+      end
+    end
+    context "when the option is a Some" do
+      it "returns the alternate" do
+        RFunc::Some.new(10).fold(2) {|el|
+          el * el
+        }.should == 100
+      end
+    end
+  end
 end
