@@ -7,6 +7,7 @@ module RFunc
     # @param value [Any] the initial value of the Option
     #
     # @return [AbstractOption] and instance of the class
+    #
     def initialize(value)
       @value = value
     end
@@ -17,6 +18,7 @@ module RFunc
     #
     # @return [Boolean] true if the Option values are identical and false
     #         if not
+    #
     def ==(object)
       object.class == self.class && object.get == @value
     end
@@ -145,10 +147,51 @@ module RFunc
       end
     end
 
+    # Flattens nested Options into a single option
+    #
+    # @return [Option] a Some if the contained value is a Some or a None
+    #         if not
+    #
+    def flatten
+      throw "#{__method__} must be defined in the subclass"
+    end
+
+    # Operates on the value of the Option if it exists and meets a criteria
+    #
+    # @param block [Function] the block that can be used to modify the value
+    #              (should be a case statement with nil return for non operation)
+    #
+    # @return [Option] the resulting Option containing a modified value if the
+    #         current Option is a Some or a None if not
+    #
+    def collect(&block)
+      throw "#{__method__} must be defined in the subclass"
+    end
+
+    # Counts the number of elements for which the block returns true
+    #
+    # @param block [Function] the function that determines whether the
+    #              value should be counted
+    #
+    # @return [Int] 1 if the block returned true for this Option value or 0 if not
+    def count(&block)
+      throw "#{__method__} must be defined in the subclass"
+    end
+
+    # Tests whether or not an object is an Option
+    #
+    # @param el [Any] the object to test
+    #
+    # @return [Boolean] true if the object is an Option or false if not
+    #
+    def is_option?(el)
+      el.is_a?(AbstractOption)
+    end
+
     private
 
       def validated_option_type(r)
-        raise RFunc::Errors::InvalidReturnType.new(r, AbstractOption) if !r.is_a?(AbstractOption)
+        raise RFunc::Errors::InvalidReturnType.new(r, AbstractOption) if !is_option?(r)
         r
       end
   end
@@ -158,11 +201,36 @@ module RFunc
       throw "RFunc::Some cannot be initialized with a nil" if something.nil?
       super(something)
     end
+
+    def flatten
+      is_option?(@value) ? @value : self
+    end
+
+    def collect(&block)
+      result = yield(@value)
+      result.nil? ? None.new : Some.new(result)
+    end
+
+    def count(&block)
+      yield(value) == true ? 1 : 0
+    end
   end
 
   class None < AbstractOption
     def initialize
       super(nil)
+    end
+
+    def flatten
+      self
+    end
+
+    def collect(&block)
+      self
+    end
+
+    def count(&block)
+      0
     end
   end
 

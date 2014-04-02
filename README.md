@@ -113,6 +113,9 @@ Ruby is NOT a functional language, nor is it optimized for functional code (tail
 
 * Complete Seq library
 * Complete Option library
+  * for_all
+  * for_each
+  * head
 
 ## Contributing
 

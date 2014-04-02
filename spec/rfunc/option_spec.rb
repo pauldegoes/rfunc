@@ -150,4 +150,55 @@ describe RFunc::Option do
       end
     end
   end
+
+  describe "#flatten" do
+    context "when the option is a None" do
+      it "returns a None" do
+        RFunc::None.new.flatten.should == RFunc::None.new
+      end
+    end
+    context "when the option is a Some[Some]" do
+      it "returns a flattened Some" do
+        RFunc::Some.new(RFunc::Some.new(1)).flatten.should == RFunc::Some.new(1)
+      end
+    end
+    context "when the option is a Some[None]" do
+      it "returns a None" do
+        RFunc::Some.new(RFunc::None.new).flatten.should == RFunc::None.new
+      end
+    end
+  end
+
+  describe "#collect" do
+    context "when the option is a None" do
+      it "returns a None" do
+        RFunc::None.new.collect {|el|
+          case el > 2
+            when true; el * 100
+            else nil
+          end
+        }.should be_a(RFunc::None)
+      end
+    end
+    context "when the option is a Some with on which the provided block returns nil" do
+      it "returns a None" do
+        RFunc::Some.new(2).collect {|el|
+          case el > 2
+            when true; el * 100
+            else nil
+          end
+        }.should be_a(RFunc::None)
+      end
+    end
+    context "when the option is a Some with on which the provided block returns a value" do
+      it "returns a None" do
+        RFunc::Some.new(3).collect {|el|
+          case el > 2
+            when true; el * 100
+            else 100
+          end
+        }.should == RFunc::Some.new(300)
+      end
+    end
+  end
 end
