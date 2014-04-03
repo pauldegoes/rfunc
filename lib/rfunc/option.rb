@@ -147,37 +147,6 @@ module RFunc
       end
     end
 
-    # Flattens nested Options into a single option
-    #
-    # @return [Option] a Some if the contained value is a Some or a None
-    #         if not
-    #
-    def flatten
-      throw "#{__method__} must be defined in the subclass"
-    end
-
-    # Operates on the value of the Option if it exists and meets a criteria
-    #
-    # @param block [Function] the block that can be used to modify the value
-    #              (should be a case statement with nil return for non operation)
-    #
-    # @return [Option] the resulting Option containing a modified value if the
-    #         current Option is a Some or a None if not
-    #
-    def collect(&block)
-      throw "#{__method__} must be defined in the subclass"
-    end
-
-    # Counts the number of elements for which the block returns true
-    #
-    # @param block [Function] the function that determines whether the
-    #              value should be counted
-    #
-    # @return [Int] 1 if the block returned true for this Option value or 0 if not
-    def count(&block)
-      throw "#{__method__} must be defined in the subclass"
-    end
-
     # Tests whether or not an object is an Option
     #
     # @param el [Any] the object to test
@@ -202,17 +171,60 @@ module RFunc
       super(something)
     end
 
+
+    # Flattens nested Options into a single option
+    #
+    # @return [Option] a Some if the contained value is a Some or a None
+    #         if not
+    #
     def flatten
       is_option?(@value) ? @value : self
     end
 
+    # Operates on the value of the Option if it exists and meets a criteria
+    #
+    # @param block [Function] the block that can be used to modify the value
+    #              (should be a case statement with nil return for non operation)
+    #
+    # @return [Option] the resulting Option containing a value modified by
+    #         the supplied block
+    #
     def collect(&block)
       result = yield(@value)
       result.nil? ? None.new : Some.new(result)
     end
 
+    # Counts the number of elements for which the block returns true
+    #
+    # @param block [Function] the function that determines whether the
+    #              value should be counted
+    #
+    # @return [Int] 1 if the block returned true for this Option value or 0 if not
+    #
     def count(&block)
       yield(value) == true ? 1 : 0
+    end
+
+    # Determines if the current Option value satisfies the supplied block
+    #
+    # @param block [Function] the function that determines whether the
+    #              value satisfies an expectation
+    #
+    # @return [Boolean] true if the block returns true for the value or false if not
+    #
+    def for_all(&block)
+      yield(@value)
+    end
+
+    # Executes the provided block with the current Option value
+    #
+    # @param block [Function] the function that takes the current Option's value
+    #
+    # @return [Nil] nil
+    #
+    def for_each(&block)
+      yield(@value)
+      nil
     end
   end
 
@@ -221,16 +233,56 @@ module RFunc
       super(nil)
     end
 
+    # Maintains signiture parity with Some.flatten
+    #
+    # @return [None] self
+    #
     def flatten
       self
     end
 
+
+    # Maintains signiture parity with Some.collect
+    #
+    # @param block [Function] the block that can be used to modify the value
+    #              (should be a case statement with nil return for non operation)
+    #
+    # @return [None] self
+    #
     def collect(&block)
       self
     end
 
+    # Counts the number of elements for which the block returns true
+    #
+    # @param block [Function] the function that determines whether the
+    #              value should be counted
+    #
+    # @return [Int] 0 (there is no value to operate on)
+    #
     def count(&block)
       0
+    end
+
+    # Determines if the current Option value satisfies the supplied block
+    #
+    # @param block [Function] the function that determines whether the
+    #              value satisfies an expectation
+    #
+    # @return [Boolean] true because the is no value to violate the supplied block
+    #
+    def for_all(&block)
+      true
+    end
+
+    # Returns nil (no value to execute on)
+    #
+    # @param block [Function] the function that takes the current Option's value
+    #
+    # @return [Nil] nil
+    #
+    def for_each(&block)
+      nil
     end
   end
 

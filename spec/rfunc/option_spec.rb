@@ -201,4 +201,43 @@ describe RFunc::Option do
       end
     end
   end
+
+  describe "#for_all" do
+    context "when the option is a None" do
+      it "returns true" do
+        RFunc::None.new.for_all {|el| el == 2}.should == true
+      end
+    end
+    context "when the option is a Some and the result of the provided block is true" do
+      it "returns true" do
+        RFunc::Some.new(2).for_all {|el| el == 2}.should == true
+      end
+    end
+    context "when the option is a Some and the result of the provided block is false" do
+      it "returns false" do
+        RFunc::Some.new(1).for_all {|el| el == 2}.should == false
+      end
+    end
+  end
+
+  describe "#for_each" do
+    context "when the option is a None" do
+      it "does not execute the yield" do
+        count = 0
+
+        RFunc::None.new.for_each {|el| count = 10 }
+
+        count.should == 0
+      end
+    end
+    context "when the option is a Some" do
+      it "not execute the yield with the Option value" do
+        count = 0
+
+        RFunc::Some.new(10).for_each {|el| count = el }
+
+        count.should == 10
+      end
+    end
+  end
 end
