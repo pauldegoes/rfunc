@@ -28,81 +28,6 @@ module RFunc
     # @return [Any] the value of the option
     def get; @value end
 
-
-    # Extracts the value of the Option if it is a Some or returns a
-    # replacement
-    #
-    # @param block [Function] the value to return if the current
-    #               Option is a None
-    #
-    # @return [Any] Either the Option value (if the current Option is
-    #         a Some) or result of the supplied block
-    #
-    def get_or_else(&block)
-      empty? ? yield : get
-    end
-
-
-    # Supplies a replacement Option if the present Option is a None
-    #
-    # @param v [Option] the option to return if the present Option
-    #          is a None
-    #
-    # @return [Option] the current option if it is a Some or the supplied
-    #         Option if it is a None
-    #
-    def or_else(v)
-      empty? ? validated_option_type(v) : self
-    end
-
-    # Operates on the Option value if present
-    #
-    # @param block [Function] the function which will be used to operate
-    #        on the Option's value if present
-    #
-    # @return [Option] the result of the function's operation
-    #         as an Option
-    #
-    def map(&block)
-      case self
-        when RFunc::Some
-          Option.new(yield(@value))
-        else
-          self
-      end
-    end
-
-    # Indicates if the Option has a value
-    #
-    # @return [Boolean] the boolean value indicating whether
-    #          or not the Option has a value (is a Some)
-    #
-    def empty?
-      @empty ||= case self
-        when RFunc::Some
-          false
-        else
-          true
-      end
-    end
-
-    # Applies a function to the value of the Option if present and
-    # flattens the resulting Option[Option] into a single Option
-    #
-    # @param block [Function] the function which will operate on the
-    #               Option's value if present (should return an Option)
-    #
-    # @return [RFunc::Option] the Option result of flattening the current
-    #         provided function's option
-    #
-    def flat_map(&block)
-      if empty?
-        None.new
-      else
-        validated_option_type(yield(get))
-      end
-    end
-
     # Filters the Some by a given function
     #
     # @param block [Function] the function which will operate on the
@@ -129,24 +54,6 @@ module RFunc
 
     alias_method :find, :filter
 
-    # Operates on the value of the Option if it is a Some or provides
-    # an alternate if it is a None
-    #
-    # @param alternate [Any] the value to return if the Option is a None
-    # @param block [Function] the function which will operate on the
-    #              current Option's value if it is a Some
-    #
-    # @return [Any] the alternate value (if the current Option is a None)
-    #               of the value of the provided block
-    #
-    def fold(alternate, &block)
-      if empty?
-        alternate
-      else
-        yield(get)
-      end
-    end
-
     # Tests whether or not an object is an Option
     #
     # @param el [Any] the object to test
@@ -171,6 +78,73 @@ module RFunc
       super(something)
     end
 
+    # Maintains signiture parity with None.get_or_else
+    #
+    # @param block [Function] the value that would return if the current
+    #               Option was a None
+    #
+    # @return [Any] Option value
+    #
+    def get_or_else(&block)
+      get
+    end
+
+    # Maintains signiture parity with None.or_else
+    #
+    # @param v [Option] the option that would return if the present Option
+    #          were a None
+    #
+    # @return [Option] the current option
+    #
+    def or_else(v)
+      self
+    end
+
+    # Operates on the Option value
+    #
+    # @param block [Function] the function which will be used to operate
+    #        on the Option's value
+    #
+    # @return [Option] the result of the function's operation
+    #         as an Option
+    #
+    def map(&block)
+      Option.new(yield(@value))
+    end
+
+    # Indicates if the Option has a value
+    #
+    # @return [Boolean] false
+    #
+    def empty?
+      false
+    end
+
+    # Applies a function to the value of the Option and
+    # flattens the resulting Option[Option] into a single Option
+    #
+    # @param block [Function] the function which will operate on the
+    #               Option's value (should return an Option)
+    #
+    # @return [RFunc::Option] the Option result of flattening the current
+    #         provided function's option
+    #
+    def flat_map(&block)
+      validated_option_type(yield(get))
+    end
+
+    # Operates on the value of the Option
+    #
+    # @param alternate [Any] the value to return if the Option is a None
+    # @param block [Function] the function which will operate on the
+    #              current Option's value
+    #
+    # @return [Any] the result of applying the supplied block to the current
+    #               Option value
+    #
+    def fold(alternate, &block)
+      yield(get)
+    end
 
     # Flattens nested Options into a single option
     #
@@ -231,6 +205,68 @@ module RFunc
   class None < AbstractOption
     def initialize
       super(nil)
+    end
+
+    # Allows for the return of a replacement value
+    #
+    # @param block [Function] a block returning an alternate value
+    #
+    # @return [Any] the result of the supplied block
+    #
+    def get_or_else(&block)
+      yield
+    end
+
+    # Returns an alternative Option for the None
+    #
+    # @param v [Option] the option to be returned
+    #
+    # @return [Option] the provided alternate Option
+    #
+    def or_else(v)
+      validated_option_type(v)
+    end
+
+    # Maintains signiture parity with Some.map
+    #
+    # @param block [Function] the function which would be used to operate
+    #        on the Option's value
+    #
+    # @return [None] a None
+    #
+    def map(&block)
+      self
+    end
+
+    # Indicates if the Option has a value
+    #
+    # @return [Boolean] true
+    #
+    def empty?
+      true
+    end
+
+    # Maintains signiture parity with Some.flat_map
+    #
+    # @param block [Function] the function which will operate on the
+    #               Option's value (should return an Option)
+    #
+    # @return [RFunc::Option] a None
+    #
+    def flat_map(&block)
+      self
+    end
+
+    # Maintains signiture parity with Some.fold
+    #
+    # @param alternate [Any] the value to return if the Option is a None
+    # @param block [Function] the function which will operate on the
+    #              current Option's value
+    #
+    # @return [Any] the alternate
+    #
+    def fold(alternate, &block)
+      alternate
     end
 
     # Maintains signiture parity with Some.flatten
