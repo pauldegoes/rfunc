@@ -2,10 +2,10 @@ require "rfunc/option"
 
 module RFunc
   class Seq
-    def initialize(set=[])
-      raise "RFunc::Seq must be initialized with an Array.  #{set.class} is not an Array" if set.class != Array
+    def initialize(seq=[])
+      raise "RFunc::Seq must be initialized with an Array.  #{seq.class} is not an Array" if seq.class != Array
 
-      @array = set
+      @array = seq
     end
 
     def all
@@ -137,6 +137,20 @@ module RFunc
       fold(Seq.new) {|accum, el|
         accum.concat(yield(el))
       }
+    end
+
+    def flatten
+      Seq.new(@array.flatten)
+    end
+
+    def count; @array.size end
+
+    def for_all(&block)
+      @array.all?{|el| yield(el) }
+    end
+
+    def for_each(&block)
+      @array.each {|el| yield(el) }
     end
 
     private

@@ -301,4 +301,28 @@ describe RFunc::Seq do
       end
     end
   end
+
+  describe "#flatten" do
+    it "returns a flattened Seq" do
+      RFunc::Seq.new([[1,2], [3,4]]).flatten.should == RFunc::Seq.new([1,2,3,4])
+    end
+  end
+
+  describe "#for_all" do
+    describe "when none of the elements fail to meet the expectation" do
+      it "returns true" do
+        seq.for_all {|el| el < 100}.should == true
+      end
+    end
+    describe "when at least one element fails to meet the expectation" do
+      it "returns false" do
+        seq.for_all {|el| el < 1}.should == false
+      end
+    end
+    describe "when the Seq is empty" do
+      it "returns true" do
+        RFunc::Seq.new([]).for_all {|el| el < 1}.should == true
+      end
+    end
+  end
 end

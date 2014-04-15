@@ -12,7 +12,6 @@ module RFunc
       @value = value
     end
 
-
     # Comparator that allows one Option to be compared against another
     # by value
     #
