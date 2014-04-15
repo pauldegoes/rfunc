@@ -153,6 +153,10 @@ module RFunc
       @array.each {|el| yield(el) }
     end
 
+    def slice(start_index, end_index=count)
+      Seq.new(@array.slice(start_index, end_index) || [])
+    end
+
     private
       def raw_head; @array[0] end
   end

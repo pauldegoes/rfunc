@@ -309,19 +309,46 @@ describe RFunc::Seq do
   end
 
   describe "#for_all" do
-    describe "when none of the elements fail to meet the expectation" do
+    context "when none of the elements fail to meet the expectation" do
       it "returns true" do
         seq.for_all {|el| el < 100}.should == true
       end
     end
-    describe "when at least one element fails to meet the expectation" do
+    context "when at least one element fails to meet the expectation" do
       it "returns false" do
         seq.for_all {|el| el < 1}.should == false
       end
     end
-    describe "when the Seq is empty" do
+    context "when the Seq is empty" do
       it "returns true" do
         RFunc::Seq.new([]).for_all {|el| el < 1}.should == true
+      end
+    end
+  end
+
+  describe "#slice" do
+    context "when the Seq is empty" do
+      it "returns an empty Seq" do
+        RFunc::Seq.new([]).slice(0,3).should == RFunc::Seq.new
+      end
+    end
+    context "when the Seq is not empty" do
+      context "when the requested range is not available" do
+        it "returns an empty Seq" do
+          seq.slice(10, 100).should == RFunc::Seq.new
+        end
+      end
+      context "when the requested range is available" do
+        it "returns an empty Seq" do
+          seq.slice(1, 2).should == RFunc::Seq.new([2,3])
+        end
+      end
+      context "when the requested range includes a negative" do
+        it "returns a Seq with elements from the slice" do
+          seq.slice(1, -2).should == RFunc::Seq.new([])
+          seq.slice(-2,2).should == RFunc::Seq.new([2,3])
+          seq.slice(-1, -3).should == RFunc::Seq.new
+        end
       end
     end
   end
