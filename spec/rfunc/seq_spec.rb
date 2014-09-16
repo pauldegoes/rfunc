@@ -392,4 +392,50 @@ describe RFunc::Seq do
       RFunc::Seq.new([[:foo, :bar]]).to_h.should eq({foo: :bar})
     end
   end
+
+  describe '#to_a' do
+    it "returns the array" do
+      seq.to_a.should eq([1,2,3])
+    end
+  end
+
+  describe '#to_ary' do
+    it "returns the array" do
+      seq.to_ary.should eq([1,2,3])
+    end
+  end
+
+  describe '#take_while' do
+    it "returns a Seq whose contents have passed the provided block's truth test until the first false" do
+      RFunc::Seq.new([1,2,3,4,5,6,7]).take_while{|el| el < 4}.should eq(seq)
+      RFunc::Seq.new([1,2,3,4,5,6,7]).take_while{|el| el > 4}.should eq(RFunc::Seq.new)
+    end
+  end
+
+  describe '#take' do
+    it "returns a Seq whose contents represent the original array's up to n length" do
+      RFunc::Seq.new([1,2,3,4,5,6,7]).take(3).should eq(seq)
+      RFunc::Seq.new([]).take(100).should eq(RFunc::Seq.new)
+    end
+  end
+
+  describe '#sort_by' do
+    it "returns an Seq sorted based on the provided block" do
+      seq.sort_by{|el| el * -1}.should == RFunc::Seq.new([3,2,1])
+      RFunc::Seq.new(["foo", "biz", "bar", "apple"]).sort_by {|el| el }.should == RFunc::Seq.new(["apple", "bar", "biz", "foo"])
+    end
+  end
+
+  describe '#sort' do
+    context "when a block is given" do
+      it "returns an Seq sorted  based on the provided block" do
+        seq.sort{|a, b| a > b ? -1 : a == b ? 0 : 1 }.should == RFunc::Seq.new([3,2,1])
+      end
+    end
+    context "when a block is not given" do
+      it "returns a Seq sorted by the default Ruby method" do
+        seq.reverse.sort.should == RFunc::Seq.new([1,2,3])
+      end
+    end
+  end
 end

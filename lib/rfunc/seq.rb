@@ -4,7 +4,7 @@ module RFunc
   class Seq
     extend Forwardable
 
-    def_delegators :@array, :[], :to_s, :to_h, :empty?, :last, :join, :count, :size, :each, :inspect, :all?
+    def_delegators :@array, :[], :to_s, :to_h, :empty?, :last, :join, :count, :size, :each, :inspect, :all?, :to_a, :to_ary
 
     def initialize(seq=[])
       raise "RFunc::Seq must be initialized with an Array.  #{seq.class} is not an Array" if seq.class != Array
@@ -152,6 +152,26 @@ module RFunc
         Seq.new(@array & seq_or_array.members)
       else
         Seq.new(@array & seq_or_array)
+      end
+    end
+
+    def take_while(&block)
+      Seq.new(@array.take_while {|r| yield(r) })
+    end
+
+    def take(n)
+      Seq.new(@array.take(n))
+    end
+
+    def sort_by(&block)
+      Seq.new(@array.sort_by {|obj| yield(obj) })
+    end
+
+    def sort(&block)
+      if block_given?
+        Seq.new(@array.sort {|x,y| yield(x,y) })
+      else
+        Seq.new(@array.sort)
       end
     end
 
