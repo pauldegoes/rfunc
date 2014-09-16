@@ -308,20 +308,20 @@ describe RFunc::Seq do
     end
   end
 
-  describe "#for_all" do
+  describe "#for_all?" do
     context "when none of the elements fail to meet the expectation" do
       it "returns true" do
-        seq.for_all {|el| el < 100}.should == true
+        seq.for_all? {|el| el < 100}.should == true
       end
     end
     context "when at least one element fails to meet the expectation" do
       it "returns false" do
-        seq.for_all {|el| el < 1}.should == false
+        seq.for_all? {|el| el < 1}.should == false
       end
     end
     context "when the Seq is empty" do
       it "returns true" do
-        RFunc::Seq.new([]).for_all {|el| el < 1}.should == true
+        RFunc::Seq.new([]).for_all? {|el| el < 1}.should == true
       end
     end
   end
@@ -350,6 +350,46 @@ describe RFunc::Seq do
           seq.slice(-1, -3).should == RFunc::Seq.new
         end
       end
+    end
+  end
+
+  describe "#intersect" do
+    it "returns a Seq of the members that are common to both sets" do
+      seq.intersect(RFunc::Seq.new([2,2,3])).should == RFunc::Seq.new([2,3])
+    end
+    it "can take an array as its argument" do
+      seq.intersect([2,2,3]).should == RFunc::Seq.new([2,3])
+    end
+  end
+
+  describe "<=>" do
+    context "when Seq members are equal" do
+      it "returns 0" do
+        (seq <=> (RFunc::Seq.new([1,2,3]))).should == 0
+      end
+    end
+    context "when Seq members are not equal" do
+      it "returns -1 if the Seq instance is less than the provided array" do
+        (seq <=> (RFunc::Seq.new([1,2,3,4]))).should == -1
+      end
+    end
+  end
+
+  describe "#to_s" do
+    it "returns a stringified version of the array" do
+      seq.to_s.should == "[1, 2, 3]"
+    end
+  end
+
+  describe "#inspect" do
+    it "returns a stringified version of the array" do
+      seq.to_s.should == "[1, 2, 3]"
+    end
+  end
+
+  describe '#to_h' do
+    it "passes the call to the native ruby method" do
+      RFunc::Seq.new([[:foo, :bar]]).to_h.should eq({foo: :bar})
     end
   end
 end

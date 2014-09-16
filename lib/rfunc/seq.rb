@@ -2,6 +2,10 @@ require "rfunc/option"
 
 module RFunc
   class Seq
+    extend Forwardable
+
+    def_delegators :@array, :[], :to_s, :to_h, :empty?, :last, :join, :count, :size, :each, :inspect, :all?
+
     def initialize(seq=[])
       raise "RFunc::Seq must be initialized with an Array.  #{seq.class} is not an Array" if seq.class != Array
 
@@ -24,21 +28,21 @@ module RFunc
       object.class == self.class && object.members == @array
     end
 
+    def <=>(seq_or_array)
+      if seq_or_array.is_a?(Seq)
+        @array <=> seq_or_array.members
+      else
+        @array <=> seq_or_array
+      end
+    end
+
     def members
       @array
     end
 
-    def [](v)
-      @array[v]
-    end
-
-    def empty?
-      @array.size == 0
-    end
-
     def head
       raise "RFunc::Seq #{@array} has no head" if @array.size == 0
-     raw_head
+      raw_head
     end
 
     alias_method :first, :head
@@ -55,10 +59,6 @@ module RFunc
 
     def tail
       @tail ||= (t_s = @array[1..-1]) ? Seq.new(t_s) : Seq.new
-    end
-
-    def last
-      @array.at(@array.size - 1)
     end
 
     def last_option
@@ -121,10 +121,6 @@ module RFunc
       result ? RFunc::Some.new(result) : RFunc::None.new
     end
 
-    def join(char)
-      @array.join(char)
-    end
-
     def concat(seq_or_array)
       if seq_or_array.is_a?(Seq)
         Seq.new(@array.concat(seq_or_array.members))
@@ -143,18 +139,20 @@ module RFunc
       Seq.new(@array.flatten)
     end
 
-    def count; @array.size end
+    alias_method :for_all?, :all?
 
-    def for_all(&block)
-      @array.all?{|el| yield(el) }
-    end
-
-    def for_each(&block)
-      @array.each {|el| yield(el) }
-    end
+    alias_method :for_each, :each
 
     def slice(start_index, end_index=count)
       Seq.new(@array.slice(start_index, end_index) || [])
+    end
+
+    def intersect(seq_or_array)
+      if seq_or_array.is_a?(Seq)
+        Seq.new(@array & seq_or_array.members)
+      else
+        Seq.new(@array & seq_or_array)
+      end
     end
 
     private
